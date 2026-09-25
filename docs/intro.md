@@ -1,14 +1,14 @@
 ---
 title: Getting started
-description: Install KeepData (Wally kartzrbx/dataservicev2), define a template, and boot server + client.
+description: Install KeepData (Wally kartzrbx/keepdata), define a template, and boot server + client.
 sidebar_position: 1
 ---
 
 # Getting started with KeepData
 
-**KeepData** (Wally package `kartzrbx/dataservicev2`, v3.2+) is a Roblox data layer: **ProfileStore** persistence, **QuickNet** replication, **typed path tokens**, optional **multi-store** replication, **OrderedDataStore leaderboards**, migrations, policy hooks, and session-only fields.
+**KeepData** (Wally package `kartzrbx/keepdata`, v1+) is a Roblox data layer: **ProfileStore** persistence, **QuickNet** replication, **typed path tokens**, optional **multi-store** replication, **OrderedDataStore leaderboards**, migrations, policy hooks, and session-only fields.
 
-In code you still `require(ReplicatedStorage.Packages.dataservicev2)` — the folder name comes from Wally. Treat the API as **KeepData** in docs and game architecture.
+In code you still `require(ReplicatedStorage.Packages.keepdata)` — the folder name comes from Wally. Treat the API as **KeepData** in docs and game architecture.
 
 Bundled dependencies (`signal`, `quicknet`, `janitor`) ship inside the package. You do **not** add them to your game's `wally.toml`.
 
@@ -16,7 +16,7 @@ Bundled dependencies (`signal`, `quicknet`, `janitor`) ship inside the package. 
 
 ```toml
 [dependencies]
-dataservicev2 = "kartzrbx/dataservicev2@3.2.0"
+keepdata = "kartzrbx/keepdata@1.0.0"
 ```
 
 ```bash
@@ -85,7 +85,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 
 local DataTemplate = require(ReplicatedStorage.DataTemplate)
-local KeepData = require(ReplicatedStorage.Packages.dataservicev2)
+local KeepData = require(ReplicatedStorage.Packages.keepdata)
 
 local PlayerStore = KeepData.Server.CreateStore(DataTemplate, "PlayerData", {
 	StrictPaths = true,
@@ -118,7 +118,7 @@ Register every **replicated** store name before packets arrive:
 ```lua
 -- StarterPlayerScripts/KeepDataClient.client.luau
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local KeepData = require(ReplicatedStorage.Packages.dataservicev2)
+local KeepData = require(ReplicatedStorage.Packages.keepdata)
 
 local data = KeepData.Client:Init({ StoreNames = { "PlayerData" } })
 local Paths = KeepData.Client.Paths

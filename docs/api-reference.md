@@ -9,7 +9,7 @@ sidebar_position: 2
 Package export (server or client):
 
 ```lua
-local KeepData = require(ReplicatedStorage.Packages.dataservicev2)
+local KeepData = require(ReplicatedStorage.Packages.keepdata)
 -- KeepData.Server      (server only)
 -- KeepData.Client      (client only)
 -- KeepData.Store       (server — CreateStore module table)

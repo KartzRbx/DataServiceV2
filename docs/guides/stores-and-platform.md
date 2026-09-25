@@ -16,7 +16,7 @@ KeepData v3 centers on **`DataStore<T>`** instances from `KeepData.Server.Create
 | `Server:Init({ Template, StoreName, ... })` | Single store; same as creating the default store once |
 
 ```lua
-local KeepData = require(ReplicatedStorage.Packages.dataservicev2)
+local KeepData = require(ReplicatedStorage.Packages.keepdata)
 
 local PlayerStore = KeepData.Server.CreateStore(DataTemplate, "PlayerData", {
 	StrictPaths = true,

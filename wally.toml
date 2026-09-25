@@ -1,7 +1,7 @@
 [package]
-name = "kartzrbx/dataservicev2"
+name = "kartzrbx/keepdata"
 description = """
-KeepData — typed player stores for Roblox (formerly DataServiceV2).
+KeepData — typed player stores for Roblox (successor to kartzrbx/dataservicev2).
 
 Features:
 - CreateStore / Server Init with ProfileStore persistence and QuickNet replication
@@ -13,7 +13,7 @@ Features:
 - GetOrderedList / GetOrderedListWithPriority for sorted table queries
 - Bundled signal, quicknet, janitor — no extra Wally deps in consuming games
 """
-version = "3.2.0"
+version = "1.0.0"
 license = "MIT"
 authors = ["KartzRBX"]
 registry = "https://github.com/UpliftGames/wally-index"

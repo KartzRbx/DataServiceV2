@@ -125,6 +125,18 @@ function copyAssets() {
   if (!fs.existsSync(publicFavicon) && fs.existsSync(favicon)) {
     fs.copyFileSync(favicon, publicFavicon);
   }
+
+  const keepDataMark = path.join(PUBLIC, "KeepData.png");
+  if (fs.existsSync(keepDataMark)) {
+    const logoCopies = [
+      path.join(PUBLIC, "keepdata-mark.png"),
+      publicFavicon,
+      path.join(ASSETS, "keepdata-mark.png"),
+    ];
+    for (const dest of logoCopies) {
+      fs.copyFileSync(keepDataMark, dest);
+    }
+  }
 }
 
 function main() {

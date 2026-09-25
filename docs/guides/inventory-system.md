@@ -114,7 +114,7 @@ Combine with [Policy](./stores-and-platform) `CanMutate` if you mutate through g
 ## Client — backpack UI
 
 ```lua
-local KeepData = require(ReplicatedStorage.Packages.dataservicev2)
+local KeepData = require(ReplicatedStorage.Packages.keepdata)
 local data = KeepData.Client:Init({ StoreNames = { "PlayerData" } })
 local Paths = KeepData.Client.Paths
 

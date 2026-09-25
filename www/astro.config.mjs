@@ -4,7 +4,7 @@ import { sidebar } from "./sidebar.js";
 
 export default defineConfig({
   site: "https://kartzrbx.github.io",
-  base: "/DataServiceV2/",
+  base: "/KeepData/",
   srcDir: "./src",
   integrations: [
     starlight({
@@ -12,15 +12,20 @@ export default defineConfig({
       description:
         "Typed stores, paths, and sync for Roblox — ProfileStore persistence, leaderboards, and Luau type functions.",
       favicon: "/favicon.png",
+      logo: {
+        src: "./src/assets/keepdata-mark.png",
+        alt: "KeepData",
+        replacesTitle: true,
+      },
       social: [
         {
           icon: "github",
           label: "GitHub",
-          href: "https://github.com/KartzRbx/DataServiceV2",
+          href: "https://github.com/KartzRbx/KeepData",
         },
       ],
       editLink: {
-        baseUrl: "https://github.com/KartzRbx/DataServiceV2/edit/master/",
+        baseUrl: "https://github.com/KartzRbx/KeepData/edit/master/",
       },
       customCss: ["./src/styles/custom.css"],
       components: {

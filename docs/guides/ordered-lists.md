@@ -9,7 +9,7 @@ Sort table entries by a numeric field (e.g. `Damage`).
 ## Example
 
 ```lua
-local KeepData = require(ReplicatedStorage.Packages.dataservicev2)
+local KeepData = require(ReplicatedStorage.Packages.keepdata)
 local Paths = PlayerStore.Paths
 local Enum = KeepData.Enum
 

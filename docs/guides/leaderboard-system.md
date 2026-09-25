@@ -26,7 +26,7 @@ local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
 
 local DataTemplate = require(ReplicatedStorage.DataTemplate)
-local KeepData = require(ReplicatedStorage.Packages.dataservicev2)
+local KeepData = require(ReplicatedStorage.Packages.keepdata)
 
 local PlayerStore = KeepData.Server.CreateStore(DataTemplate, "PlayerData", {
 	UseMock = RunService:IsStudio(), -- optional Studio mock
@@ -91,7 +91,7 @@ end
 ## Client UI (ScreenGui)
 
 ```lua
-local KeepData = require(ReplicatedStorage.Packages.dataservicev2)
+local KeepData = require(ReplicatedStorage.Packages.keepdata)
 
 KeepData.Client:Init({ StoreNames = { "PlayerData" } })
 

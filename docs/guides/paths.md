@@ -11,7 +11,7 @@ KeepData builds a **path tree** from your template. Tokens carry type informatio
 ## Store paths (recommended)
 
 ```lua
-local KeepData = require(ReplicatedStorage.Packages.dataservicev2)
+local KeepData = require(ReplicatedStorage.Packages.keepdata)
 local DataTemplate = require(ReplicatedStorage.DataTemplate)
 
 local PlayerStore = KeepData.Server.CreateStore(DataTemplate, "PlayerData")

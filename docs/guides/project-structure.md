@@ -8,7 +8,7 @@ description: Where KeepData boots, how modules share paths, and client/server la
 
 ```
 ReplicatedStorage
-  Packages/              ← wally install (dataservicev2)
+  Packages/              ← wally install (keepdata)
   DataTemplate.luau      ← export type Schema = typeof(Data)
   Shared/
     EconomyConstants.luau

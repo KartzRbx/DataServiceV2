@@ -17,11 +17,14 @@
 
 | File | Use |
 |------|-----|
-| `www/public/keepdata-mark.png` | Official logo mark (source of truth) |
-| `www/public/favicon.png` | Docs favicon (same mark) |
+| `www/public/KeepData.png` | Source file (drop updates here) |
+| `www/public/keepdata-mark.png` | README / links (copy of KeepData.png) |
+| `www/public/favicon.png` | Docs favicon |
+| `www/src/assets/keepdata-mark.png` | Starlight hero (copy of KeepData.png) |
 
 ## Wordmark
 
 **Keep** (bold, ink/blue) + **Data** (semibold, cyan).
 
-Former name: DataServiceV2 (package `kartzrbx/dataservicev2` until Wally rename).
+**Wally:** `kartzrbx/keepdata` (successor). Legacy: `kartzrbx/keepdata@1.0.0`.  
+**Docs URL:** `https://kartzrbx.github.io/KeepData/` (repo `KartzRbx/KeepData`).

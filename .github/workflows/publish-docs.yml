@@ -8,7 +8,7 @@ on:
 permissions:
   contents: write
 
-# GitHub Pages: branch gh-pages, folder /. Starlight builds to www/dist with base /DataServiceV2/.
+# GitHub Pages: branch gh-pages, folder /. Starlight builds to www/dist with base /KeepData/.
 
 jobs:
   build:
