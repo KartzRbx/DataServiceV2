@@ -121,8 +121,9 @@ function copyAssets() {
   if (fs.existsSync(logo)) {
     fs.copyFileSync(logo, path.join(ASSETS, "logo.png"));
   }
-  if (fs.existsSync(favicon)) {
-    fs.copyFileSync(favicon, path.join(PUBLIC, "favicon.png"));
+  const publicFavicon = path.join(PUBLIC, "favicon.png");
+  if (!fs.existsSync(publicFavicon) && fs.existsSync(favicon)) {
+    fs.copyFileSync(favicon, publicFavicon);
   }
 }
 

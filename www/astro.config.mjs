@@ -8,10 +8,10 @@ export default defineConfig({
   srcDir: "./src",
   integrations: [
     starlight({
-      title: "DataServiceV2",
+      title: "KeepData",
       description:
-        "ProfileStore persistence, typed paths, and automatic server/client replication for Roblox Luau.",
-      favicon: "/favicon.svg",
+        "Typed stores, paths, and sync for Roblox — ProfileStore persistence, leaderboards, and Luau type functions.",
+      favicon: "/favicon.png",
       social: [
         {
           icon: "github",
@@ -30,7 +30,7 @@ export default defineConfig({
       head: [
         {
           tag: "meta",
-          attrs: { name: "theme-color", content: "#2563eb" },
+          attrs: { name: "theme-color", content: "#1d4ed8" },
         },
       ],
     }),

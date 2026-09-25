@@ -7,4 +7,5 @@ return table.freeze({
 	ArrayInsertTransient = "tai",
 	ArrayRemoveTransient = "tar",
 	ClearTransient = "tc",
+	LeaderboardUpdate = "lb",
 })

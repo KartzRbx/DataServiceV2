@@ -1,59 +1,26 @@
-# DataServiceV2
+<p align="center">
+  <img src="www/public/keepdata-mark.png" alt="KeepData" width="200" />
+</p>
 
-High-performance Roblox data service with automatic server/client replication, embedded ProfileStore persistence, typed path tokens, QuickNet transport, and Janitor-based connection lifecycle management.
+# KeepData
 
-**Documentation:** https://kartzrbx.github.io/DataServiceV2/  
-**API reference:** https://kartzrbx.github.io/DataServiceV2/docs/api-reference  
-**Repository:** https://github.com/KartzRbx/DataServiceV2
+Typed **stores**, **paths**, **leaderboards**, and **ProfileStore** sync for Roblox Luau. Shipped on Wally as **`kartzrbx/dataservicev2`** (package folder `dataservicev2`).
 
-## Local testing
+**Docs:** https://kartzrbx.github.io/DataServiceV2/  
+**API:** https://kartzrbx.github.io/DataServiceV2/docs/api-reference  
+**Repo:** https://github.com/KartzRbx/DataServiceV2  
 
-```powershell
-.\scripts\setup-test-env.ps1
-cd Test
-rojo serve
-```
+See [BRAND.md](BRAND.md) for the logo.
 
-`Test/` is gitignored. The template lives in `test-template/`.
-
-## Installation
-
-`wally.toml`:
+## Install
 
 ```toml
 [dependencies]
-dataservicev2 = "kartzrbx/dataservicev2@2.3.3"
+dataservicev2 = "kartzrbx/dataservicev2@3.2.0"
 ```
 
 ```bash
 wally install
-```
-
-Bundled dependencies (`signal`, `quicknet`, `janitor`) are included in the package — no extra Wally deps required in your game.
-
-### Rojo setup
-
-```json
-{
-  "name": "MyGame",
-  "tree": {
-    "$className": "DataModel",
-    "ReplicatedStorage": {
-      "$className": "ReplicatedStorage",
-      "Packages": {
-        "$path": "Packages"
-      }
-    }
-  }
-}
-```
-
-Require:
-
-```lua
-local DataService = require(ReplicatedStorage.Packages.dataservicev2)
-local DataServiceServer = DataService.Server
-local DataServiceClient = DataService.Client
 ```
 
 ## Quick start
@@ -61,56 +28,40 @@ local DataServiceClient = DataService.Client
 **Server**
 
 ```lua
-local DataServiceServer = require(ReplicatedStorage.Packages.dataservicev2).Server
-
-DataServiceServer:Init({
-	Template = DataTemplate,
-	StoreName = "PlayerDataV2",
-	StrictPaths = true,
-})
-
-local data = DataServiceServer:WaitFor(player)
-local Paths = DataServiceServer.Paths :: DataTemplate.Schema
-data:Set(Paths.Currencies.Coins, 100)
+local KeepData = require(ReplicatedStorage.Packages.dataservicev2)
+local PlayerStore = KeepData.Server.CreateStore(DataTemplate, "PlayerData", { StrictPaths = true })
+local handle = PlayerStore:WaitFor(player)
+handle:Set(PlayerStore.Paths.Currencies.Coins, 100)
 ```
 
 **Client**
 
 ```lua
-local DataServiceClient = require(ReplicatedStorage.Packages.dataservicev2).Client
-local data = DataServiceClient:Init()
-local Paths = DataServiceClient.Paths :: DataTemplate.Schema
-print(data:Get(Paths.Currencies.Coins))
+local KeepData = require(ReplicatedStorage.Packages.dataservicev2)
+local data = KeepData.Client:Init({ StoreNames = { "PlayerData" } })
+print(data:Get(KeepData.Client.Paths.Currencies.Coins))
 ```
 
-## Features
+## Highlights (v3.2)
 
-- Typed path tokens (`DataService.Paths.Currencies.Coins`)
-- ProfileStore persistence with automatic reconciliation
-- QuickNet replication with Janitor cleanup
-- Transient overlay API for admin/QA panels (`*Transient`)
-- Ordered list queries with `Enum.OrderList.Asc` / `Desc`
+- `CreateStore`, `ServerDataHandle` (`Patch`, `Watch`), multi-store `GetStore`
+- Leaderboards on path tokens + client `GetLeaderboard`
+- Migrations, policy, session data, transient overlay, ordered lists
+- Guides: [inventory](https://kartzrbx.github.io/DataServiceV2/docs/guides/inventory-system), [leaderboard](https://kartzrbx.github.io/DataServiceV2/docs/guides/leaderboard-system)
 
-## Docs
-
-Site (Astro Starlight, same stack as [CL++](https://kartzrbx.github.io/CLPP/)):
-
-- [Home](https://kartzrbx.github.io/DataServiceV2/)
-- [Getting started](https://kartzrbx.github.io/DataServiceV2/docs/intro)
-- [API reference](https://kartzrbx.github.io/DataServiceV2/docs/api-reference)
-- [Project structure](https://kartzrbx.github.io/DataServiceV2/docs/guides/project-structure)
-
-Local preview:
+## Local docs
 
 ```powershell
 npm install
 npm run docs
 ```
 
-Production build:
+Sources in `docs/`; CI publishes `www/dist` to GitHub Pages on push to `master`.
+
+## Local Rojo test
 
 ```powershell
-npm run docs:build
+.\scripts\setup-test-env.ps1
+cd Test
+rojo serve
 ```
-
-Markdown sources live in `docs/`; CI copies them into `www/` and publishes `www/dist` to GitHub Pages on push to `master`.

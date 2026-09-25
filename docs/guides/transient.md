@@ -4,14 +4,14 @@ sidebar_position: 4
 
 # Transient overlay
 
-Test overlay: values are visible and replicated to the client, but **not saved** to ProfileStore.
+KeepData test overlay: values are visible and replicated to the client, but **not saved** to ProfileStore.
 
 ## Use case
 
 Player has **500 real coins**. An admin panel adds **+500** to display **1000**, but on leave only **500** should be saved.
 
 ```lua
-local Paths = DataServiceServer.Paths :: DataTemplate.Schema
+local Paths = PlayerStore.Paths -- or KeepData.Server.Paths after Init
 
 -- real progress (saved)
 data:Set(Paths.Currencies.Coins, 500)

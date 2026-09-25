@@ -9,8 +9,9 @@ Sort table entries by a numeric field (e.g. `Damage`).
 ## Example
 
 ```lua
-local Enum = require(ReplicatedStorage.Packages.dataservicev2).Enum
-local Paths = DataServiceServer.Paths :: DataTemplate.Schema
+local KeepData = require(ReplicatedStorage.Packages.dataservicev2)
+local Paths = PlayerStore.Paths
+local Enum = KeepData.Enum
 
 local ordered = data:GetOrderedListWithPriority(
 	Paths.Units.List,

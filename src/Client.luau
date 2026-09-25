@@ -8,14 +8,23 @@ const Janitor = require(packages.janitor)
 const Signal = require(packages.signal)
 
 const Data = require(script.Parent.Data)
-const Enums = require(script.Parent.Enums)
 const Path = require(script.Parent.Path)
 const Replicator = require(script.Parent.Replicator).Client
+const Leaderboard = require(script.Parent.Leaderboard)
+const ClientRegistry = require(script.Parent.ClientRegistry)
+
 type JanitorT = typeof(Janitor.new())
+
+export type ClientInitOptions = {
+	StoreNames: { string }?,
+}
+
 export type ClientApi<T> = {
-	Init: (self: ClientApi<T>) -> Data.Data<T>,
+	Init: (self: ClientApi<T>, options: ClientInitOptions?) -> Data.Data<T>,
 	WaitForData: (self: ClientApi<T>) -> Data.Data<T>,
 	Get: (self: ClientApi<T>) -> Data.Data<T>?,
+	GetStore: <U>(self: ClientApi<T>, storeName: string) -> ClientRegistry.ClientStoreView<U>,
+	GetLeaderboard: (self: ClientApi<T>, name: string) -> Leaderboard.ClientLeaderboard,
 	GetBufferStats: (self: ClientApi<T>) -> ClientBufferStats?,
 	Destroy: (self: ClientApi<T>) -> (),
 	Paths: Path.PathTree<T>,
@@ -30,136 +39,62 @@ type ClientBufferStats = {
 
 const Client = {
 	_initialized = false,
-	_data = nil :: Data.Data<never>?,
-	Paths = nil :: Path.PathTree<never>?,
+	_primaryStoreName = "PlayerData",
 	_janitor = nil :: JanitorT?,
 	_bufferStats = nil :: ClientBufferStats?,
 	_loaded = Signal.new(),
 }
 
---[=[
-	@method Init
-	@within DataServiceClient
-	@yields
-	@return Data
-	Initializes the client and yields for the initial server snapshot.
-]=]
-function Client:Init()
+function Client:Init(options: ClientInitOptions?)
 	if not self._initialized then
 		self._initialized = true
 		self._janitor = Janitor.new()
 		self._janitor:add(self._loaded, "Destroy")
+
+		local storeNames = if options and options.StoreNames then options.StoreNames else { self._primaryStoreName }
+		if #storeNames > 0 then
+			self._primaryStoreName = storeNames[1]
+		end
+		for _, storeName in storeNames do
+			ClientRegistry.registerStore(storeName)
+		end
+
 		local bufferChangedConnection = Replicator.BufferChanged:Connect(function(stats)
 			self._bufferStats = stats
 		end)
 		self._janitor:add(function()
 			bufferChangedConnection:Disconnect()
 		end, true)
-
-		Replicator:On(Enums.Init, function(_path, snapshot)
-			if self._data then
-				self._data:Destroy()
-			end
-			self._data = Data.new(snapshot, false, {
-				Template = snapshot,
-			}) :: Data.Data<typeof(snapshot)>
-			self.Paths = Path.createTemplatePaths(snapshot)
-			self._loaded:Fire()
-		end)
-
-		Replicator:On(Enums.Set, function(path, value)
-			if self._data then
-				Data._applySet(self._data, path, value)
-			end
-		end)
-
-		Replicator:On(Enums.ArrayInsert, function(path, value, index)
-			if self._data then
-				Data._applyArrayInsert(self._data, path, value, index)
-			end
-		end)
-
-		Replicator:On(Enums.ArrayRemove, function(path, index)
-			if self._data then
-				Data._applyArrayRemove(self._data, path, index)
-			end
-		end)
-
-		Replicator:On(Enums.SetTransient, function(path, value)
-			if self._data then
-				Data._applyTransientSet(self._data, path, value)
-			end
-		end)
-
-		Replicator:On(Enums.ArrayInsertTransient, function(path, value, index)
-			if self._data then
-				Data._applyTransientArrayInsert(self._data, path, value, index)
-			end
-		end)
-
-		Replicator:On(Enums.ArrayRemoveTransient, function(path, index)
-			if self._data then
-				Data._applyTransientArrayRemove(self._data, path, index)
-			end
-		end)
-
-		Replicator:On(Enums.ClearTransient, function(path)
-			if self._data then
-				Data._applyTransientClear(self._data, path)
-			end
-		end)
-
-		Replicator:NotifyReady()
 	end
 
 	return self:WaitForData()
 end
 
---[=[
-	@method WaitForData
-	@within DataServiceClient
-	@yields
-	@return Data
-	Yields until replicated data is available.
-]=]
 function Client:WaitForData<T>(): Data.Data<T>
-	if self._data then
-		return self._data :: Data.Data<T>
-	end
-	self._loaded:Wait()
-	return self._data :: Data.Data<T>
+	local view = ClientRegistry.waitForStore<T>(self._primaryStoreName)
+	self.Paths = view.Paths
+	self._loaded:Fire()
+	return view.Data
 end
 
---[=[
-	@method Get
-	@within DataServiceClient
-	@return Data?
-	Returns data if the snapshot was already received.
-]=]
 function Client:Get()
-	return self._data
+	local view = ClientRegistry.getDefaultStore()
+	if view then
+		self.Paths = view.Paths
+		return view.Data
+	end
+	return nil
 end
 
---[=[
-	@method GetBufferStats
-	@within DataServiceClient
-	@return table?
-	Returns QuickNet replication buffer metrics.
-]=]
+function Client:GetStore<U>(storeName: string): ClientRegistry.ClientStoreView<U>
+	return ClientRegistry.waitForStore<U>(storeName)
+end
+
 function Client:GetBufferStats()
 	return self._bufferStats or Replicator:GetBufferStats()
 end
 
---[=[
-	@method Destroy
-	@within DataServiceClient
-	Cleans up client connections and listeners.
-]=]
 function Client:Destroy()
-	if self._data then
-		self._data:Destroy()
-		self._data = nil
-	end
 	if self._janitor then
 		self._janitor:cleanup()
 		self._janitor = nil
@@ -167,20 +102,21 @@ function Client:Destroy()
 	Replicator:Destroy()
 end
 
---[=[
-	@class DataServiceClient
-	Client singleton. Access via `require(Packages.dataservicev2).Client`.
-	Data is read-only — mutations must happen on the server.
-]=]
 const PublicClient: ClientApi<never> = {
-	Init = function<T>(self: ClientApi<T>): Data.Data<T>
-		return Client:Init() :: Data.Data<T>
+	Init = function<T>(self: ClientApi<T>, options: ClientInitOptions?): Data.Data<T>
+		return Client:Init(options) :: Data.Data<T>
 	end,
 	WaitForData = function<T>(self: ClientApi<T>): Data.Data<T>
 		return Client:WaitForData() :: Data.Data<T>
 	end,
 	Get = function<T>(self: ClientApi<T>): Data.Data<T>?
 		return Client:Get()
+	end,
+	GetStore = function<T, U>(_: ClientApi<T>, storeName: string): ClientRegistry.ClientStoreView<U>
+		return Client:GetStore(storeName)
+	end,
+	GetLeaderboard = function(_, name: string): Leaderboard.ClientLeaderboard
+		return Leaderboard.getClient(name)
 	end,
 	GetBufferStats = function(_): ClientBufferStats?
 		return Client:GetBufferStats()
@@ -191,16 +127,14 @@ const PublicClient: ClientApi<never> = {
 	Paths = Path.rootToken(),
 }
 
---[=[
-	@prop Paths PathTree
-	@within DataServiceClient
-	Typed path tree. Available after `Init`.
-]=]
-
 setmetatable(PublicClient, {
 	__index = function(_, key)
 		if key == "Paths" then
-			return Client.Paths
+			local view = ClientRegistry.getDefaultStore()
+			if view and view.Paths then
+				return view.Paths
+			end
+			return Client.Paths or Path.rootToken()
 		end
 		return nil
 	end,

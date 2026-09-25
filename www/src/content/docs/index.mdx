@@ -1,15 +1,21 @@
 ---
-title: DataServiceV2
-description: ProfileStore persistence, typed paths, and automatic server/client replication for Roblox Luau.
+title: KeepData
+description: Typed stores, paths, leaderboards, and ProfileStore sync for Roblox Luau.
 template: splash
 hero:
-  title: DataServiceV2
-  tagline: ProfileStore persistence, typed paths, and automatic server/client replication for Roblox Luau.
+  title: KeepData
+  tagline: Player data that stays typed, replicated, and persistent — stores, paths, leaderboards, migrations, and policy on ProfileStore + QuickNet.
+  image:
+    file: ../../assets/keepdata-mark.png
+    alt: KeepData logo
   actions:
     - text: Getting started
       link: docs/intro
       icon: rocket
       variant: primary
+    - text: Leaderboard example
+      link: docs/guides/leaderboard-system
+      icon: star
     - text: API reference
       link: docs/api-reference
       icon: document
@@ -21,43 +27,56 @@ hero:
 import { Card, CardGrid } from "@astrojs/starlight/components";
 
 <CardGrid stagger>
-  <Card title="Simple setup" icon="rocket">
-    Initialize on server and client in a few lines. Templates reconcile automatically through ProfileStore.
-    Start at [Getting started](docs/intro).
+  <Card title="CreateStore + paths" icon="rocket">
+    `Server.CreateStore(template, "PlayerData")` gives you typed `Paths`, `Patch`, `Watch`, and handles without manual schema casts.
+    [Getting started](docs/intro).
   </Card>
-  <Card title="Automatic replication" icon="setting">
-    Server changes replicate to clients over QuickNet. Clients keep a read-only local mirror.
+  <Card title="Real game patterns" icon="document">
+    Step-by-step [inventory](docs/guides/inventory-system) and [global leaderboard](docs/guides/leaderboard-system) systems with server authority and client UI.
   </Card>
-  <Card title="Typed paths" icon="list-format">
-    Use `DataService.Paths.Currencies.Coins` instead of manual path arrays.
-    Read [Typed paths](docs/guides/paths).
+  <Card title="Leaderboards" icon="star">
+    OrderedDataStore boards tied to path tokens, delta/full client sync, and rank-change signals.
+  </Card>
+  <Card title="Multi-store" icon="setting">
+    Replicate `PlayerData` and `GuildData` with `Client:Init({ StoreNames = { ... } })`.
+    [Stores and platform](docs/guides/stores-and-platform).
+  </Card>
+  <Card title="Migrations & policy" icon="list-format">
+    Version profiles, rate-limit mutations, audit writes, and keep session-only state off disk.
   </Card>
   <Card title="Transient overlay" icon="pencil">
     Preview admin or QA values without saving to ProfileStore.
-    See [Transient overlay](docs/guides/transient).
+    [Transient overlay](docs/guides/transient).
   </Card>
 </CardGrid>
 
-## How it fits in your game
+## Architecture
 
 <pre class="mermaid">
-flowchart LR
-  template["Data template module"] --> init["Server Init"]
-  init --> store["ProfileStore"]
-  store --> data["Data handle"]
-  data --> paths["Paths.Get / Set"]
-  paths --> net["QuickNet replicate"]
-  net --> client["Client mirror"]
+flowchart TB
+  subgraph server [Server]
+    CS[CreateStore]
+    PS[ProfileStore]
+    ODS[OrderedDataStore leaderboards]
+    CS --> PS
+    CS --> ODS
+  end
+  subgraph client [Client]
+    CR[ClientRegistry mirrors]
+    UI[UI controllers]
+    CR --> UI
+  end
+  CS -->|QuickNet| CR
 </pre>
 
-Install with Wally: `kartzrbx/dataservicev2`. Bundled `signal`, `quicknet`, and `janitor` ship inside the package — no extra deps in your game's `wally.toml`.
+**Wally:** `kartzrbx/dataservicev2@3.2.0` (KeepData). Bundled `signal`, `quicknet`, and `janitor` — no extra deps in your game.
 
-## Quick accessors
+## Common APIs
 
-| You write | You mean |
+| Task | API |
 | --- | --- |
-| `DataServiceServer:WaitFor(player)` | Block until profile is loaded |
-| `data:Get(Paths.Currencies.Coins)` | Read merged value (persisted + transient) |
-| `data:Set(Paths.Currencies.Coins, 100)` | Write and replicate (server) |
-| `data:GetChangedSignal(Paths.Stats.Level)` | React to a path change |
-| `data:GetOrderedList(Paths.Inventory, Enum.OrderList.Desc)` | Sorted list query |
+| Load player | `PlayerStore:WaitFor(player)` |
+| Add coins | `handle:Update(Paths.Currencies.Coins, fn)` |
+| Backpack UI | `data:GetChangedSignal(Paths.Inventory.Items)` |
+| Top 100 board | `PlayerStore:CreateLeaderboard({ ... })` |
+| Studio without API | `UseMock = true` on store options |

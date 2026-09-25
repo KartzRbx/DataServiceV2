@@ -11,6 +11,7 @@ const BUFFER_EVENT = "DataServiceV2/Buffer"
 const MAX_PACKET_BYTES = 1024
 
 type Packet = {
+	StoreId: string,
 	Action: string,
 	Path: any,
 	Payload: { any },
@@ -53,9 +54,10 @@ if RunService:IsServer() then
 		"Disconnect",
 	})
 
-	function Server:Send(player: Player, action: string, path: any, ...)
+	function Server:Send(storeId: string, player: Player, action: string, path: any, ...)
 		local payload = table.pack(...)
 		local packet: Packet = {
+			StoreId = storeId,
 			Action = action,
 			Path = path,
 			Payload = payload,
@@ -112,7 +114,7 @@ if RunService:IsServer() then
 
 	Replicator.Server = Server
 else
-	local handlers: { [string]: (any, ...any) -> () } = {}
+	local handlers: { [string]: { [string]: (storeId: string, path: any, ...any) -> () } } = {}
 	local _cleanupTasks: { any } = {}
 	const Client = {
 		BufferChanged = Signal.new(),
@@ -127,10 +129,15 @@ else
 	table.insert(_cleanupTasks, { Client.BufferChanged, "Destroy" })
 	table.insert(_cleanupTasks, {
 		dataEvent.OnClientEvent:Connect(function(packet: Packet)
-			local h = handlers[packet.Action]
+			local storeId = packet.StoreId or "PlayerData"
+			local byStore = handlers[storeId]
+			if not byStore then
+				return
+			end
+			local h = byStore[packet.Action]
 			if h then
 				local payload = packet.Payload
-				h(packet.Path, table.unpack(payload, 1, payload.n or #payload))
+				h(storeId, packet.Path, table.unpack(payload, 1, payload.n or #payload))
 			end
 		end),
 		"Disconnect",
@@ -143,8 +150,18 @@ else
 		"Disconnect",
 	})
 
-	function Client:On(action: string, fn: (any, ...any) -> ())
-		handlers[action] = fn
+	function Client:OnStore(storeId: string, action: string, fn: (storeId: string, path: any, ...any) -> ())
+		if not handlers[storeId] then
+			handlers[storeId] = {}
+		end
+		handlers[storeId][action] = fn
+	end
+
+	-- Legacy global handler (single default store).
+	function Client:On(action: string, fn: (path: any, ...any) -> ())
+		Client:OnStore("PlayerData", action, function(_storeId, path, ...)
+			fn(path, ...)
+		end)
 	end
 
 	function Client:NotifyReady()

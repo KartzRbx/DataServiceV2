@@ -1,77 +1,53 @@
 ---
 sidebar_position: 3
+title: Typed paths
+description: Path tokens from your template — no manual path arrays, minimal casting.
 ---
 
 # Typed paths
 
-DataServiceV2 builds a path tree from the template passed to `Server:Init`.
+KeepData builds a **path tree** from your template. Tokens carry type information and work with `Set`, `Get`, signals, leaderboards, and `Exclude`.
 
-## Recommended usage
+## Store paths (recommended)
 
 ```lua
-local DataService = require(ReplicatedStorage.Packages.dataservicev2)
-local Paths = DataService.Server.Paths :: DataTemplate.Schema
+local KeepData = require(ReplicatedStorage.Packages.dataservicev2)
+local DataTemplate = require(ReplicatedStorage.DataTemplate)
 
-data:Set(Paths.Currencies.Coins, 100)
-local coins = data:Get(Paths.Currencies.Coins)
+local PlayerStore = KeepData.Server.CreateStore(DataTemplate, "PlayerData")
+local Paths = PlayerStore.Paths
 
-data:GetChangedSignal(Paths.Currencies.Coins):Connect(function(newValue, oldValue)
+local handle = PlayerStore:WaitFor(player)
+handle:Set(Paths.Currencies.Coins, 100)
+
+handle.Data:GetChangedSignal(Paths.Currencies.Coins):Connect(function(newValue, oldValue)
 	print(newValue, oldValue)
 end)
 ```
 
-Paths live on the **service** (`DataService.Server.Paths`), not on the `data` instance.
+No `:: DataTemplate.Schema` cast is required when you use **`PlayerStore.Paths`** — Luau infers from the store generic.
 
-## Shared modules
+## Legacy Init
 
-In `ReplicatedStorage.Shared` modules:
+After `Server:Init`, paths live on `KeepData.Server.Paths` and `KeepData.Paths` on the root export.
 
-```lua
-local DataService = require(ReplicatedStorage.Packages.dataservicev2)
+## Client
 
--- Server (after Server:Init)
-local Paths = DataService.Paths :: DataTemplate.Schema
+After `Client:Init`, use `KeepData.Client.Paths` or `GetStore(name).Paths`.
 
--- Client (after Client:Init)
-local Paths = DataService.Client.Paths :: DataTemplate.Schema
-```
-
-On `2.2.2+`, `DataService.Client` exists on the server as a safe facade with stub `Paths`. Client methods only work on the client.
-
-## Legacy format
-
-String arrays still work:
+## Path module (advanced)
 
 ```lua
-data:Set({ "Currencies", "Coins" }, 100)
+local Path = KeepData.Path
+type Coins = Path.PathValue<typeof(PlayerStore.Paths.Currencies.Coins)>
 ```
 
-Prefer typed paths for autocomplete and fewer typos.
+`PathOf`, `PathToken`, and `createTemplatePaths` power the tree — useful for shared libraries and codegen.
 
-## Validation
+## Rules
 
-| Option | Default | Description |
-|---|---|---|
-| `StrictPaths` | `true` | Blocks writes to invalid paths |
-| `AutoCreateMissingTables` | `false` | Does not auto-create missing nested tables |
+- Paths must exist on the template (unless `AutoCreateMissingTables` allows nested creation).
+- With `StrictPaths = true`, invalid keys error at mutation time.
+- `Exclude` uses the same tokens: `Exclude = { PlayerStore.Paths.ServerOnly }`.
 
-Legacy permissive mode:
-
-```lua
-DataServiceServer:Init({
-	Template = DataTemplate,
-	StrictPaths = false,
-	AutoCreateMissingTables = true,
-})
-```
-
-## Private data
-
-Paths in `Exclude` are not replicated to the client:
-
-```lua
-DataServiceServer:Init({
-	Template = DataTemplate,
-	Exclude = { { "Private" } },
-})
-```
+See [Inventory example](./inventory-system) for array paths.

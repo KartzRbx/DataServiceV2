@@ -1,18 +1,19 @@
 [package]
 name = "kartzrbx/dataservicev2"
 description = """
-High-performance Roblox data service with typed path tokens, ProfileStore persistence, and QuickNet replication.
+KeepData — typed player stores for Roblox (formerly DataServiceV2).
 
 Features:
-- Generic typed templates with chainable Paths tokens (DataService.Paths.Currencies.Coins)
-- Server/client singleton API with automatic replication and Janitor cleanup
-- Transient overlay API (SetTransient, UpdateTransient, ClearTransient) for admin/test panels:
-  changes appear in Get() and replicate to the client, but are NOT saved to ProfileStore
-- Persisted reads via GetPersisted() vs merged reads via Get()
-- Ordered list queries: GetOrderedList() and GetOrderedListWithPriority() with Enum.OrderList.Asc / Enum.OrderList.Desc
-- Bundled dependencies (signal, quicknet, janitor) — no extra Wally deps required in consuming games
+- CreateStore / Server Init with ProfileStore persistence and QuickNet replication
+- Typed path tokens (Store.Paths.Currencies.Coins) — PathOf, Patch, Watch on handles
+- Multi-store client replication (Client:Init StoreNames, GetStore)
+- OrderedDataStore leaderboards with delta/full sync and client rank signals
+- Migrations (TemplateVersion), Policy (rate limit, ACL, audit), session-only data
+- Transient overlay API for admin/QA (not saved to ProfileStore)
+- GetOrderedList / GetOrderedListWithPriority for sorted table queries
+- Bundled signal, quicknet, janitor — no extra Wally deps in consuming games
 """
-version = "2.3.3"
+version = "3.2.0"
 license = "MIT"
 authors = ["KartzRBX"]
 registry = "https://github.com/UpliftGames/wally-index"

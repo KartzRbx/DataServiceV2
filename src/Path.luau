@@ -101,6 +101,24 @@ export type PathTree<T> = PathOf<T>
 export type PathToken<V> = { __pathValue: V }
 export type TemplatePaths<T> = PathTree<T>
 
+type function PathValueOf(tokenType: type): type
+	if tokenType:is("any") or tokenType:is("unknown") or tokenType:is("never") then
+		return types.any
+	end
+	if not tokenType:is("table") then
+		return types.any
+	end
+	local leaf = tokenType:readproperty(types.singleton("__pathValue"))
+	if leaf then
+		return leaf
+	end
+	return types.any
+end
+
+export type PathValue<P> = PathValueOf<P>
+
+type _anchorPathValue = PathValueOf<PathToken<number>>
+
 local ROOT_TOKEN: PathTree<{}>? = nil
 
 const clone = function(path: Path?): Path

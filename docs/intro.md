@@ -1,31 +1,29 @@
 ---
 title: Getting started
-description: Install DataServiceV2 with Wally, define a template, and initialize server and client.
+description: Install KeepData (Wally kartzrbx/dataservicev2), define a template, and boot server + client.
 sidebar_position: 1
 ---
 
-# Getting Started with DataServiceV2
+# Getting started with KeepData
 
-DataServiceV2 manages player persistence on the server and keeps clients in sync automatically.
+**KeepData** (Wally package `kartzrbx/dataservicev2`, v3.2+) is a Roblox data layer: **ProfileStore** persistence, **QuickNet** replication, **typed path tokens**, optional **multi-store** replication, **OrderedDataStore leaderboards**, migrations, policy hooks, and session-only fields.
 
-Wally package: `kartzrbx/dataservicev2`. Bundled dependencies (`signal`, `quicknet`, `janitor`) are included — you do not need to add them to your game's `wally.toml`.
+In code you still `require(ReplicatedStorage.Packages.dataservicev2)` — the folder name comes from Wally. Treat the API as **KeepData** in docs and game architecture.
+
+Bundled dependencies (`signal`, `quicknet`, `janitor`) ship inside the package. You do **not** add them to your game's `wally.toml`.
 
 ## 1) Install
 
-Add to your game's `wally.toml`:
-
 ```toml
 [dependencies]
-dataservicev2 = "kartzrbx/dataservicev2@2.3.3"
+dataservicev2 = "kartzrbx/dataservicev2@3.2.0"
 ```
-
-Then run:
 
 ```bash
 wally install
 ```
 
-In Rojo, sync `Packages` to `ReplicatedStorage.Packages`:
+Rojo — map `Packages` into `ReplicatedStorage`:
 
 ```json
 {
@@ -34,19 +32,19 @@ In Rojo, sync `Packages` to `ReplicatedStorage.Packages`:
     "$className": "DataModel",
     "ReplicatedStorage": {
       "$className": "ReplicatedStorage",
-      "Packages": {
-        "$path": "Packages"
-      }
+      "Packages": { "$path": "Packages" },
+      "DataTemplate": { "$path": "src/DataTemplate.luau" }
     }
   }
 }
 ```
 
-## 2) Define your data template
+## 2) Data template
 
-Create a module with default player data:
+Keep values JSON-serializable (numbers, strings, booleans, arrays, plain tables).
 
 ```lua
+-- ReplicatedStorage/DataTemplate.luau
 local Data = {
 	Currencies = {
 		Coins = 0,
@@ -55,8 +53,15 @@ local Data = {
 	Stats = {
 		Level = 1,
 		XP = 0,
+		TotalCoinsEarned = 0,
 	},
-	Inventory = {} :: { string },
+	Inventory = {
+		Items = {} :: { { Id = "", Count = 0 } },
+		MaxSlots = 24,
+	},
+	Settings = {
+		MusicVolume = 0.8,
+	},
 }
 
 export type Schema = typeof(Data)
@@ -64,74 +69,99 @@ export type Schema = typeof(Data)
 return Data
 ```
 
-> Keep values JSON-compatible (numbers, strings, booleans, arrays, dictionaries).
+Optional codegen scaffold:
 
-## 3) Initialize on the server
+```bash
+npm run dataservice:generate
+```
 
-In a server script, initialize DataService once:
+## 3) Server bootstrap (recommended: `CreateStore`)
+
+`CreateStore` is the v3 entry point: typed `Store.Paths`, `ServerDataHandle` (`Set`, `Patch`, `Watch`), leaderboards, migrations, and policy — without casting `Paths` to `Schema`.
 
 ```lua
+-- ServerScriptService/KeepDataServer.server.luau
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local DataTemplate = require(ReplicatedStorage.DataTemplate)
-local DataServiceServer = require(ReplicatedStorage.Packages.dataservicev2).Server
+local Players = game:GetService("Players")
 
-DataServiceServer:Init({
+local DataTemplate = require(ReplicatedStorage.DataTemplate)
+local KeepData = require(ReplicatedStorage.Packages.dataservicev2)
+
+local PlayerStore = KeepData.Server.CreateStore(DataTemplate, "PlayerData", {
+	StrictPaths = true,
+	TemplateVersion = 1,
+	UseMock = false, -- true in Studio without DataStore access
+})
+
+local Paths = PlayerStore.Paths
+
+Players.PlayerAdded:Connect(function(player)
+	local handle = PlayerStore:WaitFor(player)
+	handle:Set(Paths.Currencies.Coins, 100)
+end)
+```
+
+Legacy one-liner (still supported):
+
+```lua
+KeepData.Server:Init({
 	Template = DataTemplate,
-	StoreName = "PlayerDataV2",
+	StoreName = "PlayerData",
 	StrictPaths = true,
 })
 ```
 
-After `Init`, typed paths are available on `DataServiceServer.Paths`:
+## 4) Client bootstrap
+
+Register every **replicated** store name before packets arrive:
 
 ```lua
-local Players = game:GetService("Players")
-
-Players.PlayerAdded:Connect(function(player)
-	local data = DataServiceServer:WaitFor(player)
-	local Paths = DataServiceServer.Paths :: DataTemplate.Schema
-
-	data:Set(Paths.Currencies.Coins, 100)
-end)
-```
-
-## 4) Init, read, and react on the client
-
-On the client, initialize and subscribe to changes:
-
-```lua
+-- StarterPlayerScripts/KeepDataClient.client.luau
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local DataTemplate = require(ReplicatedStorage.DataTemplate)
-local DataServiceClient = require(ReplicatedStorage.Packages.dataservicev2).Client
+local KeepData = require(ReplicatedStorage.Packages.dataservicev2)
 
-local data = DataServiceClient:Init()
-local Paths = DataServiceClient.Paths :: DataTemplate.Schema
+local data = KeepData.Client:Init({ StoreNames = { "PlayerData" } })
+local Paths = KeepData.Client.Paths
 
 print("Coins:", data:Get(Paths.Currencies.Coins))
 
 data:GetChangedSignal(Paths.Currencies.Coins):Connect(function(newValue, oldValue)
-	print("Coins updated:", oldValue, "->", newValue)
+	print("Coins:", oldValue, "->", newValue)
 end)
 ```
 
-## 5) Update data on the server
-
-Mutate player data with `Set` or `Update`:
+## 5) Mutate on the server only
 
 ```lua
-local data = DataServiceServer:WaitFor(player)
-local Paths = DataServiceServer.Paths :: DataTemplate.Schema
+local handle = PlayerStore:WaitFor(player)
+local Paths = PlayerStore.Paths
 
-data:Update(Paths.Currencies.Coins, function(current)
-	return (current or 0) + 100
+handle:Update(Paths.Currencies.Coins, function(current)
+	return (current or 0) + 50
 end)
+
+handle:Patch({
+	Stats = { XP = handle:Get(Paths.Stats.XP) + 10 },
+})
 ```
 
-## Local test environment
+Clients mirror data through QuickNet; never call `Set` / `Update` on the client.
 
-This repo includes a Rojo sandbox under `Test/` (gitignored). Copy the template and sync:
+## What KeepData gives you
 
-```bash
+| Capability | Where to learn more |
+| --- | --- |
+| Typed paths (`Store.Paths.Currencies.Coins`) | [Typed paths](./guides/paths) |
+| Inventory-style lists and patches | [Inventory system](./guides/inventory-system) |
+| Global leaderboards (ODS + client UI) | [Leaderboard system](./guides/leaderboard-system) |
+| Stores, migrations, policy, session data | [Stores & platform](./guides/stores-and-platform) |
+| Admin preview without saving | [Transient overlay](./guides/transient) |
+| Sorting backpack / quest lists | [Ordered lists](./guides/ordered-lists) |
+| Full method list | [API reference](./api-reference) |
+
+## Local test sandbox
+
+```powershell
 .\scripts\setup-test-env.ps1
 cd Test
 rojo serve
@@ -140,8 +170,5 @@ rojo serve
 ## Next steps
 
 - [Recommended project structure](./guides/project-structure)
-- [Typed paths](./guides/paths)
-- [Transient overlay](./guides/transient)
-- [Ordered lists](./guides/ordered-lists)
-- [Full API reference](./api-reference)
-- [Generated API docs](/api)
+- [Example: leaderboard](./guides/leaderboard-system)
+- [Example: inventory](./guides/inventory-system)

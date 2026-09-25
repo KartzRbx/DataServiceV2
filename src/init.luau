@@ -29,16 +29,26 @@ end
 const DataService = {
 	Paths = Path.rootToken(),
 	Enum = require(script.Enum),
+	Types = require(script.Types),
+	Path = Path,
+	Migration = require(script.Migration),
+	Policy = require(script.Policy),
+	Watch = require(script.Watch),
+	SessionData = require(script.SessionData),
 }
 
 if RunService:IsServer() then
 	const Server = require(script.Server)
+	const Store = require(script.Store)
 	DataService.Server = Server
+	DataService.Store = Store
 	DataService.Client = createUnavailableContext("Client")
 	DataService.Paths = Server.Paths
 else
 	const Client = require(script.Client)
+	const ClientRegistry = require(script.ClientRegistry)
 	DataService.Client = Client
+	DataService.ClientRegistry = ClientRegistry
 	DataService.Server = createUnavailableContext("Server")
 	DataService.Paths = Client.Paths
 end

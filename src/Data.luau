@@ -30,13 +30,17 @@ const INDEX_CHANGED_MAP_KEY = {}
 const ARRAY_INSERTED_MAP_KEY = {}
 const ARRAY_REMOVED_MAP_KEY = {}
 const TRANSIENT_KEY = {}
+const MUTATION_GUARD_KEY = {}
 
 export type DataPath = Path.Path
 export type DataPathLike = Path.Path | Path.PathToken<never>
+export type MutationGuard = (action: string, path: DataPath, oldValue: any?, newValue: any?) -> boolean
+
 export type DataOptions<T = never> = {
 	StrictPaths: boolean?,
 	AutoCreateMissingTables: boolean?,
 	Template: T?,
+	MutationGuard: MutationGuard?,
 }
 export type OrderedListOrder = typeof(PackageEnum.OrderList.Asc) | typeof(PackageEnum.OrderList.Desc) | "asc" | "desc"
 export type OrderedListOptions = {
@@ -346,6 +350,7 @@ function Data.new<T>(initial: T, writable: boolean?, options: DataOptions<T>?): 
 		[ARRAY_INSERTED_MAP_KEY] = {} :: { [string]: SignalT },
 		[ARRAY_REMOVED_MAP_KEY] = {} :: { [string]: SignalT },
 		[TRANSIENT_KEY] = {} :: { [string]: any },
+		[MUTATION_GUARD_KEY] = if options and options.MutationGuard then options.MutationGuard else nil,
 		Changed = Signal.new(),
 		Destroyed = false,
 	}
@@ -472,6 +477,10 @@ function Data:_applySet(path: DataPath, value: any)
 	local parent, key = descend(self[ROOT_KEY], path, self[AUTO_CREATE_KEY])
 	assert(parent ~= nil and key ~= nil, string.format(INVALID_PATH_ERROR, pathToString(path)))
 	local old = rawget(parent, key)
+	local guard = self[MUTATION_GUARD_KEY]
+	if guard and not guard(Enums.Set, path, old, value) then
+		return
+	end
 	if self[STRICT_PATHS_KEY] and not self[AUTO_CREATE_KEY] and old == nil and type(key) ~= "number" then
 		error(string.format(INVALID_PATH_ERROR, pathToString(path)))
 	end
@@ -567,6 +576,10 @@ end
 	@param value any
 	Writes and persists to ProfileStore. **Server only.**
 ]=]
+function Data:Watch<V>(path: Path.PathToken<V>, callback: (newValue: V, oldValue: V) -> ()): AnyConnection
+	return self:GetChangedSignal(path):Connect(callback)
+end
+
 function Data:Set(path: DataPathLike, value: any)
 	assert(self[WRITABLE_KEY], READ_ONLY_ERROR)
 	local normalized = normalizePath(path, false) :: DataPath
