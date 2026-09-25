@@ -1,5 +1,7 @@
 ---
+title: Ordered lists
 sidebar_position: 5
+description: Sort table entries by numeric fields with Enum.OrderList.
 ---
 
 # Ordered lists

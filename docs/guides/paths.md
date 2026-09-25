@@ -27,9 +27,9 @@ end)
 
 No `:: DataTemplate.Schema` cast is required when you use **`PlayerStore.Paths`** — Luau infers from the store generic.
 
-## Legacy Init
+## After `Server:Init`
 
-After `Server:Init`, paths live on `KeepData.Server.Paths` and `KeepData.Paths` on the root export.
+If you use single-store `Init` instead of `CreateStore`, paths live on `KeepData.Server.Paths` and `KeepData.Paths` on the root export.
 
 ## Client
 

@@ -6,7 +6,7 @@ description: CreateStore, multi-store replication, migrations, policy, session d
 
 # Stores and platform features
 
-KeepData v3 centers on **`DataStore<T>`** instances from `KeepData.Server.CreateStore`. Each store has its own ProfileStore name, path tree, optional replication, and leaderboards.
+KeepData centers on **`DataStore<T>`** instances from `KeepData.Server.CreateStore`. Each store has its own ProfileStore name, path tree, optional replication, and leaderboards.
 
 ## CreateStore vs Init
 
@@ -64,7 +64,7 @@ QuickNet packets include **`StoreId`** (your `StoreName`) so replication stays i
 
 ## Migrations
 
-Bump `TemplateVersion` and supply ordered migration steps. Version is stored at `_DataService.TemplateVersion` on the profile unless you customize migration metadata.
+Bump `TemplateVersion` and supply ordered migration steps. Version is stored at `_DataService.TemplateVersion` on the profile (internal meta table name for compatibility) unless you customize `MetaPath` in migrations.
 
 ```lua
 local PlayerStore = KeepData.Server.CreateStore(DataTemplate, "PlayerData", {

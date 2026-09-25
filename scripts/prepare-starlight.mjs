@@ -83,14 +83,22 @@ function mermaidToHtml(body) {
   });
 }
 
+function stripFirstH1(body) {
+  return body.replace(/^\s*#\s+[^\n]+\r?\n+/, "");
+}
+
 function stripMatchingH1(body, title) {
   if (!title) {
-    return body;
+    return stripFirstH1(body);
   }
   const re = new RegExp(
     `^\\s*#\\s+${title.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s*\\r?\\n+`
   );
-  return body.replace(re, "");
+  const stripped = body.replace(re, "");
+  if (stripped === body) {
+    return stripFirstH1(body);
+  }
+  return stripped;
 }
 
 function transform(rel, text) {

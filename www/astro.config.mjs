@@ -14,7 +14,7 @@ export default defineConfig({
       favicon: "/favicon.png",
       logo: {
         src: "./src/assets/keepdata-mark.png",
-        alt: "KeepData",
+        alt: "",
         replacesTitle: true,
       },
       social: [

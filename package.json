@@ -2,9 +2,11 @@
   "private": true,
   "workspaces": ["www"],
   "scripts": {
-    "docs": "npm run dev -w dataservicev2-docs",
-    "docs:build": "npm run build -w dataservicev2-docs",
-    "dataservice:generate": "node scripts/dataservice-generate.mjs",
-    "dataservice:check": "node scripts/dataservice-generate.mjs"
+    "docs": "npm run dev -w keepdata-docs",
+    "docs:build": "npm run build -w keepdata-docs",
+    "keepdata:generate": "node scripts/keepdata-generate.mjs",
+    "keepdata:check": "node scripts/keepdata-generate.mjs",
+    "dataservice:generate": "npm run keepdata:generate",
+    "dataservice:check": "npm run keepdata:check"
   }
 }

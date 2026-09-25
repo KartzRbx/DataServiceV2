@@ -1,6 +1,6 @@
 ---
 title: API reference
-description: KeepData (DataService v3) — Server, Client, Store, handles, Data, leaderboards, and enums.
+description: KeepData — Server, Client, Store, handles, Data, leaderboards, and enums.
 sidebar_position: 2
 ---
 
@@ -32,7 +32,7 @@ Server singleton. Writable. Use **`CreateStore`** (preferred) or **`Init`** once
 | Method / property | Returns | Description |
 | --- | --- | --- |
 | `CreateStore(template, storeName, options?)` | `DataStore<T>` | New store with paths, replication, leaderboards |
-| `:Init(options)` | `Server` | Legacy single-store bootstrap |
+| `:Init(options)` | `Server` | Single-store bootstrap (alternative to `CreateStore`) |
 | `:WaitFor(player)` | `ServerDataHandle<T>` | Default store — yields until loaded |
 | `:Get(player)` | `ServerDataHandle<T>?` | Default store if ready |
 | `:HasData(player)` | `boolean` | Default store session ready |

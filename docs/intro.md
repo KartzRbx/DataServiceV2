@@ -1,5 +1,5 @@
 ---
-title: Getting started
+title: Getting started with KeepData
 description: Install KeepData (Wally kartzrbx/keepdata), define a template, and boot server + client.
 sidebar_position: 1
 ---
@@ -18,6 +18,8 @@ Bundled dependencies (`signal`, `quicknet`, `janitor`) ship inside the package. 
 [dependencies]
 keepdata = "kartzrbx/keepdata@1.0.0"
 ```
+
+> **Migrating from `kartzrbx/dataservicev2`?** Replace the dependency key with `keepdata`, run `wally install`, and change requires to `ReplicatedStorage.Packages.keepdata`. Profile data stays compatible.
 
 ```bash
 wally install
@@ -72,12 +74,12 @@ return Data
 Optional codegen scaffold:
 
 ```bash
-npm run dataservice:generate
+npm run keepdata:generate
 ```
 
 ## 3) Server bootstrap (recommended: `CreateStore`)
 
-`CreateStore` is the v3 entry point: typed `Store.Paths`, `ServerDataHandle` (`Set`, `Patch`, `Watch`), leaderboards, migrations, and policy — without casting `Paths` to `Schema`.
+`CreateStore` is the main entry point: typed `Store.Paths`, `ServerDataHandle` (`Set`, `Patch`, `Watch`), leaderboards, migrations, and policy — without casting `Paths` to `Schema`.
 
 ```lua
 -- ServerScriptService/KeepDataServer.server.luau
@@ -101,7 +103,7 @@ Players.PlayerAdded:Connect(function(player)
 end)
 ```
 
-Legacy one-liner (still supported):
+Alternative — single-store `Init`:
 
 ```lua
 KeepData.Server:Init({

@@ -1,5 +1,7 @@
 ---
+title: Transient overlay
 sidebar_position: 4
+description: Admin and QA overlays that replicate but do not save to ProfileStore.
 ---
 
 # Transient overlay
