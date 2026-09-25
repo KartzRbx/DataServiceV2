@@ -6,11 +6,11 @@
 
 Typed **stores**, **paths**, **leaderboards**, and **ProfileStore** sync for Roblox Luau.
 
-**Docs:** https://kartzrbx.github.io/KeepData/  
-**API:** https://kartzrbx.github.io/KeepData/docs/api-reference  
-**Repo:** https://github.com/KartzRbx/KeepData  
+**Docs:** https://kartzrbx.github.io/DataServiceV2/  
+**API:** https://kartzrbx.github.io/DataServiceV2/docs/api-reference  
+**Repo:** https://github.com/KartzRbx/DataServiceV2  
 
-Legacy Wally name: `kartzrbx/keepdata` (frozen at 3.2.0). New installs use **`kartzrbx/keepdata`**.
+Wally: **`kartzrbx/keepdata@1.0.0`**
 
 See [BRAND.md](BRAND.md) for logo assets.
 
@@ -24,8 +24,6 @@ keepdata = "kartzrbx/keepdata@1.0.0"
 ```bash
 wally install
 ```
-
-Rojo: sync `Packages` to `ReplicatedStorage.Packages`.
 
 ## Quick start
 
@@ -46,12 +44,10 @@ local data = KeepData.Client:Init({ StoreNames = { "PlayerData" } })
 print(data:Get(KeepData.Client.Paths.Currencies.Coins))
 ```
 
-## Highlights
+## Guides
 
-- `CreateStore`, `ServerDataHandle` (`Patch`, `Watch`), multi-store `GetStore`
-- Leaderboards on path tokens + client `GetLeaderboard`
-- Migrations, policy, session data, transient overlay, ordered lists
-- Guides: [inventory](https://kartzrbx.github.io/KeepData/docs/guides/inventory-system), [leaderboard](https://kartzrbx.github.io/KeepData/docs/guides/leaderboard-system)
+- [Inventory](https://kartzrbx.github.io/DataServiceV2/docs/guides/inventory-system)
+- [Leaderboard](https://kartzrbx.github.io/DataServiceV2/docs/guides/leaderboard-system)
 
 ## Local docs
 
@@ -59,5 +55,3 @@ print(data:Get(KeepData.Client.Paths.Currencies.Coins))
 npm install
 npm run docs
 ```
-
-Sources in `docs/`; CI publishes to GitHub Pages on push to `master`.

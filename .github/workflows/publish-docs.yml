@@ -8,7 +8,7 @@ on:
 permissions:
   contents: write
 
-# GitHub Pages: branch gh-pages, folder /. Starlight builds to www/dist with base /KeepData/.
+# GitHub Pages: branch gh-pages, folder /. Starlight base must match repo name (/DataServiceV2/).
 
 jobs:
   build:
@@ -22,6 +22,8 @@ jobs:
         run: |
           npm install
           npm run docs:build
+      - name: Postprocess static output
+        run: node scripts/postprocess-pages.mjs
       - name: Deploy GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:

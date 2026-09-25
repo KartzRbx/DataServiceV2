@@ -4,7 +4,7 @@ import { sidebar } from "./sidebar.js";
 
 export default defineConfig({
   site: "https://kartzrbx.github.io",
-  base: "/KeepData/",
+  base: "/DataServiceV2/",
   srcDir: "./src",
   integrations: [
     starlight({
@@ -21,11 +21,11 @@ export default defineConfig({
         {
           icon: "github",
           label: "GitHub",
-          href: "https://github.com/KartzRbx/KeepData",
+          href: "https://github.com/KartzRbx/DataServiceV2",
         },
       ],
       editLink: {
-        baseUrl: "https://github.com/KartzRbx/KeepData/edit/master/",
+        baseUrl: "https://github.com/KartzRbx/DataServiceV2/edit/master/",
       },
       customCss: ["./src/styles/custom.css"],
       components: {

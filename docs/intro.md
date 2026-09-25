@@ -19,8 +19,6 @@ Bundled dependencies (`signal`, `quicknet`, `janitor`) ship inside the package. 
 keepdata = "kartzrbx/keepdata@1.0.0"
 ```
 
-> **Migrating from `kartzrbx/dataservicev2`?** Replace the dependency key with `keepdata`, run `wally install`, and change requires to `ReplicatedStorage.Packages.keepdata`. Profile data stays compatible.
-
 ```bash
 wally install
 ```

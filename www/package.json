@@ -6,7 +6,7 @@
     "predev": "node ../scripts/prepare-starlight.mjs",
     "dev": "astro dev",
     "prebuild": "node ../scripts/prepare-starlight.mjs",
-    "build": "astro build",
+    "build": "astro build && node ../scripts/postprocess-pages.mjs",
     "preview": "astro preview"
   },
   "dependencies": {

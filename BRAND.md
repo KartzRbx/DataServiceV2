@@ -2,7 +2,7 @@
 
 ## Concept
 
-- **Chameleon mark** — geometric white chameleon on black; adaptability and “keeping” data in sync.
+- **Chameleon mark** — geometric white chameleon on black (adaptability, keeping data in sync).
 - **Keep** — persistence and sync; **Data** — typed stores and paths.
 
 ## Colors
@@ -26,5 +26,5 @@
 
 **Keep** (bold, ink/blue) + **Data** (semibold, cyan).
 
-**Wally:** `kartzrbx/keepdata` (successor). Legacy: `kartzrbx/keepdata@1.0.0`.  
-**Docs URL:** `https://kartzrbx.github.io/KeepData/` (repo `KartzRbx/KeepData`).
+**Wally:** `kartzrbx/keepdata`  
+**Docs (GitHub Pages):** https://kartzrbx.github.io/DataServiceV2/ — repo name is historical; product name is **KeepData**.

@@ -64,7 +64,7 @@ QuickNet packets include **`StoreId`** (your `StoreName`) so replication stays i
 
 ## Migrations
 
-Bump `TemplateVersion` and supply ordered migration steps. Version is stored at `_DataService.TemplateVersion` on the profile (internal meta table name for compatibility) unless you customize `MetaPath` in migrations.
+Bump `TemplateVersion` and supply ordered migration steps. Version is stored on the profile at meta path `TemplateVersion` (default container key in saved data) unless you customize `MetaPath` in migrations.
 
 ```lua
 local PlayerStore = KeepData.Server.CreateStore(DataTemplate, "PlayerData", {
