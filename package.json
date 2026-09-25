@@ -1,0 +1,8 @@
+{
+  "private": true,
+  "workspaces": ["www"],
+  "scripts": {
+    "docs": "npm run dev -w dataservicev2-docs",
+    "docs:build": "npm run build -w dataservicev2-docs"
+  }
+}

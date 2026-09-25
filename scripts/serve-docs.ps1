@@ -9,7 +9,7 @@ if (-not (Get-Command moonwave -ErrorAction SilentlyContinue)) {
 
 Push-Location $root
 try {
-	Write-Host "Starting docs at http://localhost:3000/KartzData-V2/"
+	Write-Host "Starting docs at http://localhost:3000/DataServiceV2/"
 	moonwave dev
 } finally {
 	Pop-Location

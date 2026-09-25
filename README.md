@@ -2,9 +2,9 @@
 
 High-performance Roblox data service with automatic server/client replication, embedded ProfileStore persistence, typed path tokens, QuickNet transport, and Janitor-based connection lifecycle management.
 
-**Documentation:** https://kartzrbx.github.io/KartzData-V2/docs/intro  
-**API reference:** https://kartzrbx.github.io/KartzData-V2/docs/api-reference  
-**Repository:** https://github.com/KartzRbx/KartzData-V2
+**Documentation:** https://kartzrbx.github.io/DataServiceV2/  
+**API reference:** https://kartzrbx.github.io/DataServiceV2/docs/api-reference  
+**Repository:** https://github.com/KartzRbx/DataServiceV2
 
 ## Local testing
 
@@ -93,6 +93,24 @@ print(data:Get(Paths.Currencies.Coins))
 
 ## Docs
 
-- [Getting started](https://kartzrbx.github.io/KartzData-V2/docs/intro)
-- [API reference](https://kartzrbx.github.io/KartzData-V2/docs/api-reference)
-- [Project structure](https://kartzrbx.github.io/KartzData-V2/docs/guides/project-structure)
+Site (Astro Starlight, same stack as [CL++](https://kartzrbx.github.io/CLPP/)):
+
+- [Home](https://kartzrbx.github.io/DataServiceV2/)
+- [Getting started](https://kartzrbx.github.io/DataServiceV2/docs/intro)
+- [API reference](https://kartzrbx.github.io/DataServiceV2/docs/api-reference)
+- [Project structure](https://kartzrbx.github.io/DataServiceV2/docs/guides/project-structure)
+
+Local preview:
+
+```powershell
+npm install
+npm run docs
+```
+
+Production build:
+
+```powershell
+npm run docs:build
+```
+
+Markdown sources live in `docs/`; CI copies them into `www/` and publishes `www/dist` to GitHub Pages on push to `master`.

@@ -1,12 +1,15 @@
 title = "DataServiceV2"
-gitRepoUrl = "https://github.com/KartzRbx/KartzData-V2"
+gitRepoUrl = "https://github.com/KartzRbx/DataServiceV2"
 gitSourceBranch = "master"
 changelog = true
+
+# Public site is built with Astro Starlight (www/). See package.json scripts docs:build.
+# Moonwave config below is kept for local API doc generation only.
 
 [docusaurus]
 tagline = "ProfileStore persistence, typed paths, and automatic server/client replication for Roblox Luau."
 url = "https://kartzrbx.github.io"
-baseUrl = "/KartzData-V2"
+baseUrl = "/DataServiceV2"
 
 [footer]
 style = "dark"

@@ -464,4 +464,4 @@ local clientStats = DataServiceClient:GetBufferStats()
 | Painel de teste salvou moedas | Voce usou `Set`/`Update` em vez de `*Transient` |
 | `UseMock` nao faz overlay | `UseMock` mocka o store inteiro; overlay usa `*Transient` |
 | `attempt to call a nil value` em `Data:148` | Atualize para `>=2.3.3` (correcao em `deepCopyTable`) |
-| CSS/docs 404 no GitHub Pages | Use URLs com `/KartzData-V2/` (repo renomeado de `KartzDataService`) |
+| CSS/docs 404 no GitHub Pages | Use URLs com `/DataServiceV2/` (site em `kartzrbx.github.io/DataServiceV2`) |

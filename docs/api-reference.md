@@ -1,4 +1,6 @@
 ---
+title: API reference
+description: Methods and options for DataServiceServer, DataServiceClient, and Data handles.
 sidebar_position: 2
 ---
 

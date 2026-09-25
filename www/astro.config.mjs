@@ -1,0 +1,38 @@
+import { defineConfig } from "astro/config";
+import starlight from "@astrojs/starlight";
+import { sidebar } from "./sidebar.js";
+
+export default defineConfig({
+  site: "https://kartzrbx.github.io",
+  base: "/DataServiceV2/",
+  srcDir: "./src",
+  integrations: [
+    starlight({
+      title: "DataServiceV2",
+      description:
+        "ProfileStore persistence, typed paths, and automatic server/client replication for Roblox Luau.",
+      favicon: "/favicon.svg",
+      social: [
+        {
+          icon: "github",
+          label: "GitHub",
+          href: "https://github.com/KartzRbx/DataServiceV2",
+        },
+      ],
+      editLink: {
+        baseUrl: "https://github.com/KartzRbx/DataServiceV2/edit/master/",
+      },
+      customCss: ["./src/styles/custom.css"],
+      components: {
+        Head: "./src/components/Head.astro",
+      },
+      sidebar,
+      head: [
+        {
+          tag: "meta",
+          attrs: { name: "theme-color", content: "#2563eb" },
+        },
+      ],
+    }),
+  ],
+});

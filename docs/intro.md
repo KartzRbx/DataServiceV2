@@ -1,4 +1,6 @@
 ---
+title: Getting started
+description: Install DataServiceV2 with Wally, define a template, and initialize server and client.
 sidebar_position: 1
 ---
 

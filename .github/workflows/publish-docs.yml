@@ -8,20 +8,22 @@ on:
 permissions:
   contents: write
 
+# GitHub Pages: branch gh-pages, folder /. Starlight builds to www/dist with base /DataServiceV2/.
+
 jobs:
-  publish:
+  build:
     runs-on: ubuntu-latest
-    name: Publish docs to gh-pages
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
-
-      - run: npm i -g moonwave@latest
-
-      - name: Build Moonwave site
-        run: moonwave build --publish
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Install and build Starlight
+        run: |
+          npm install
+          npm run docs:build
+      - name: Deploy GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./www/dist

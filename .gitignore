@@ -28,3 +28,9 @@ build/
 
 # Local Rojo test sandbox (copy from test-template via scripts/setup-test-env.ps1)
 /Test/
+
+# Starlight docs (generated + build output)
+node_modules/
+www/dist/
+www/.astro/
+www/src/content/docs/docs/

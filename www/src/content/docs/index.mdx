@@ -1,0 +1,63 @@
+---
+title: DataServiceV2
+description: ProfileStore persistence, typed paths, and automatic server/client replication for Roblox Luau.
+template: splash
+hero:
+  title: DataServiceV2
+  tagline: ProfileStore persistence, typed paths, and automatic server/client replication for Roblox Luau.
+  actions:
+    - text: Getting started
+      link: docs/intro
+      icon: rocket
+      variant: primary
+    - text: API reference
+      link: docs/api-reference
+      icon: document
+    - text: Wally install
+      link: docs/intro
+      variant: minimal
+---
+
+import { Card, CardGrid } from "@astrojs/starlight/components";
+
+<CardGrid stagger>
+  <Card title="Simple setup" icon="rocket">
+    Initialize on server and client in a few lines. Templates reconcile automatically through ProfileStore.
+    Start at [Getting started](docs/intro).
+  </Card>
+  <Card title="Automatic replication" icon="setting">
+    Server changes replicate to clients over QuickNet. Clients keep a read-only local mirror.
+  </Card>
+  <Card title="Typed paths" icon="list-format">
+    Use `DataService.Paths.Currencies.Coins` instead of manual path arrays.
+    Read [Typed paths](docs/guides/paths).
+  </Card>
+  <Card title="Transient overlay" icon="pencil">
+    Preview admin or QA values without saving to ProfileStore.
+    See [Transient overlay](docs/guides/transient).
+  </Card>
+</CardGrid>
+
+## How it fits in your game
+
+<pre class="mermaid">
+flowchart LR
+  template["Data template module"] --> init["Server Init"]
+  init --> store["ProfileStore"]
+  store --> data["Data handle"]
+  data --> paths["Paths.Get / Set"]
+  paths --> net["QuickNet replicate"]
+  net --> client["Client mirror"]
+</pre>
+
+Install with Wally: `kartzrbx/dataservicev2`. Bundled `signal`, `quicknet`, and `janitor` ship inside the package — no extra deps in your game's `wally.toml`.
+
+## Quick accessors
+
+| You write | You mean |
+| --- | --- |
+| `DataServiceServer:WaitFor(player)` | Block until profile is loaded |
+| `data:Get(Paths.Currencies.Coins)` | Read merged value (persisted + transient) |
+| `data:Set(Paths.Currencies.Coins, 100)` | Write and replicate (server) |
+| `data:GetChangedSignal(Paths.Stats.Level)` | React to a path change |
+| `data:GetOrderedList(Paths.Inventory, Enum.OrderList.Desc)` | Sorted list query |
